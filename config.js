@@ -1,7 +1,7 @@
 const mysql = require("mysql2/promise");
 const server_uri = "http://localhost";
 const server_port = 3000;
-const server = "https://59e0-105-113-73-167.ngrok-free.app";//`${server_uri}:${server_port}`;
+const server = "https://alquify-server-production.up.railway.app";//`${server_uri}:${server_port}`;
 require("dotenv").config();
 
 
@@ -54,7 +54,7 @@ const config  = {
 
 
     db: mysql.createPool({
-        host: process.env.DB_HOST,
+        host: "sql7.freesqldatabase.com",
         database: process.env.DB_NAME, 
         user: process.env.DB_USER, 
         password: process.env.DB_PASSWORD, 
