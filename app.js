@@ -1,6 +1,6 @@
 const client = "http://localhost:5173";
 const client2 = "https://localhost";
-const this_server_url = "https://59e0-105-113-73-167.ngrok-free.app";
+const this_server_url = "https://alquify-server-production.up.railway.app";
 const ws_clients = {};
 const express = require("express");
 const OpenAI = require("openai").OpenAI;
@@ -20,7 +20,7 @@ const argon2 = require("argon2");
 const crypto = require("crypto");
 const http = require("http");
 const WebSocket = require("ws");
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 const app = express();
 const config = require("./config");
 const GoogleAuth = require("./google-auth");
