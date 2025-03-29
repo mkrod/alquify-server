@@ -22,5 +22,10 @@
   },
   "devDependencies": {
     "@types/node": "^22.10.5"
+  },
+  "scripts": {
+  "start": "node app.js"
   }
 }
+
+
