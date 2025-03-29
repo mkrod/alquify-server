@@ -637,6 +637,7 @@ app.get("/logout", async (req, res) => {
 ////////////////////////
 ///////////////////////
 const axios = require('axios');
+/*
 const passport = require('passport');
 const OAuth2Strategy = require('passport-oauth2');
 
@@ -656,7 +657,7 @@ app.get('/auth/callback', passport.authenticate('oauth2', { failureRedirect: '/'
       res.send('Authentication successful!');
 
 });
-
+*/
 
 app.get('/auth/facebook/callback', async (req, res) => {
     const { code } = req.query;
