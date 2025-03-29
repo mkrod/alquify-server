@@ -61,6 +61,9 @@ const config  = {
         port: 3306,
         queueLimit: 200,
         connectionLimit: 10,
+        ssl: {
+            rejectUnauthorized: false,
+        }
     }),
 
     open_ai:  {
