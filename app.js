@@ -1017,7 +1017,7 @@ app.get("/", (req, res) => {
 require("dotenv").config();
 
 console.log("envs: ", process.env);
-db.getConnection((err, connection) => {
+config.db.getConnection((err, connection) => {
     if (err) {
       console.error('❌ Database connection error:', err);
       return;
