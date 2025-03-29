@@ -1,5 +1,5 @@
 const client = "http://localhost:5173";
-const client2 = "https://localhost";
+const client2 = "http://localhost";
 const this_server_url = "https://alquify-server-production.up.railway.app";
 const ws_clients = {};
 const express = require("express");
