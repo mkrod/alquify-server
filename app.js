@@ -1,4 +1,6 @@
 const client = "http://localhost:5173";
+const pro_client = "https://alquify.up.railway.app";
+const pro_client_2 = "https://railway.app";
 const client2 = "http://localhost";
 const this_server_url = "https://alquify-server-production.up.railway.app";
 const ws_clients = {};
@@ -27,7 +29,7 @@ const GoogleAuth = require("./google-auth");
 
 app.use(express.json());
 app.use(cors({
-    origin: [client, client2 ,this_server_url],
+    origin: [client, client2, pro_client, pro_client_2 ,this_server_url],
     credentials: true,
 }));
 app.use(express.urlencoded({ extended: true }));
@@ -286,6 +288,7 @@ app.post("/sign-up", async (req, res) => {
 
     try {
         const results = await config.db.execute("SELECT * FROM users WHERE email = ? ", [email]);
+        console.log("check existing user: ", results)
         if (results[0].length === 0) {
             const results = await config.db.execute("INSERT INTO users (user_id, email, password, auth_method) VALUES (?, ?, ?, ?)", [userID, email, hashedPassword, method]);
             if (results?.affectedRows > 0) {
@@ -1014,9 +1017,18 @@ app.get("/", (req, res) => {
 require("dotenv").config();
 
 console.log("envs: ", process.env);
+db.getConnection((err, connection) => {
+    if (err) {
+      console.error('❌ Database connection error:', err);
+      return;
+    }
+    console.log('✅ Connected to FreeSQLDatabase');
+    connection.release();  // Release the connection
+  });
+
 
 // Start the server
 server.listen(PORT, "0.0.0.0", () => {
     console.log(`App is running on port ${PORT}`);
-    console.log(`WebSocket server is running on ws://localhost:${PORT}`);
+    console.log(`WebSocket server is running on ws://${this_server_url}:${PORT}`);
 });
