@@ -1014,17 +1014,19 @@ app.get("/", (req, res) => {
              </html>`);
 });
 
-require("dotenv").config();
 
-console.log("envs: ", process.env);
-config.db.getConnection((err, connection) => {
-    if (err) {
-      console.error('❌ Database connection error:', err);
-      return;
+async function testConnection() {
+    try {
+      const connection = await config.db.getConnection();
+      console.log('✅ Successfully connected to MySQL');
+      connection.release();
+    } catch (error) {
+      console.error('❌ MySQL Connection Error:', error.message);
     }
-    console.log('✅ Connected to FreeSQLDatabase');
-    connection.release();  // Release the connection
-  });
+  }
+  
+  testConnection();
+  
 
 
 // Start the server
