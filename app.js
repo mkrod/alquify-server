@@ -1011,7 +1011,9 @@ app.get("/", (req, res) => {
              </html>`);
 });
 
+require("dotenv").config();
 
+console.log("envs: ", process.env);
 
 // Start the server
 server.listen(PORT, "0.0.0.0", () => {
