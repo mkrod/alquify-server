@@ -289,7 +289,7 @@ app.get("/auth/callback", async (req, res) => {
             
             res.cookie("user_email", userInfo.email, cookie);
             res.cookie("user_id", user_id, cookie);
-            res.send(success("started", { isLoggedIn: req.session.isLoggedIn }));
+            //res.send(success("started", { isLoggedIn: req.session.isLoggedIn }));
             
             res.send(`
                 <html>
