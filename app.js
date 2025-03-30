@@ -53,19 +53,17 @@ app.use((req, res, next) => {
 
 
 app.set("trust proxy", 1);
+
 const cookie = {            
     secure: true,
-    sameSite: "lax", 
 }
-app.use(
-    session({
-        name: "_alquify-session-id_",
-        secret: secret,
-        resave: false,
-        saveUninitialized: false,
-        cookie,
-    })
-);
+app.set('trust proxy', 1) // trust first proxy
+app.use(session({
+  secret: secret,
+  resave: false,
+  saveUninitialized: true,
+  cookie: cookie
+}))
 
 
 
