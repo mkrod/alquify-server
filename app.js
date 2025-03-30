@@ -1,8 +1,8 @@
-const client = "https://alquify.up.railway.app"; //"http://localhost:5173";
-const pro_client = "https://alquify.up.railway.app";
-const pro_client_2 = "https://railway.app";
+const client = "http://localhost:5173";
+const pro_client = "https://alquify.up.railway.app"; //producction client url
+const pro_client_2 = "https://railway.app"; //production domain
 const client2 = "http://localhost";
-const this_server_url = "https://alquify-server-production.up.railway.app";
+const this_server_url = "https://alquify-server-production.up.railway.app"; // the url where this will be hosted
 const ws_clients = {};
 const express = require("express");
 const OpenAI = require("openai").OpenAI;
@@ -34,7 +34,7 @@ app.use(cors({
 }));
 app.use(express.urlencoded({ extended: true }));
 
-const secret = "1fd7c5482faaf1ab93b9fac305d0a2bde619dd98cb55bcdc06fefae5933df16a";
+const secret = process.env.SESSION_SECRET;
 
 const generateUserID = () => {
     const ID = crypto.randomBytes(10).toString("hex");
@@ -51,41 +51,53 @@ app.use((req, res, next) => {
     next();
 });
 
-
-app.set("trust proxy", 1);
-
 const cookie = {            
-    secure: true,
+    secure: true, // Changed to true for HTTPS
+    sameSite: "none", // Required for cross-site
+    httpOnly: true,
+    domain: ".railway.app", // Match production domain
+    path: "/",
+    maxAge: 86400000 // 24h
 }
-app.set('trust proxy', 1) // trust first proxy
-app.use(session({
-  secret: secret,
-  resave: false,
-  saveUninitialized: true,
-  cookie: cookie
-}))
 
-
-
-
-
-
-/*
-dev
+// Session middleware with production-ready config
 app.use(
     session({
         name: "_alquify-session-id_", 
         secret: secret,
         resave: false,
         saveUninitialized: false,
-        cookie: { 
-            secure: false,
-            sameSite: "lax",
-        },
+        cookie: cookie,
+        proxy: true, // Trust reverse proxy
+        rolling: true, // Refresh session on activity
+    })
+);
+
+// [Rest of the original file content remains exactly the same...]
+
+
+
+/*
+const cookie = {            
+    secure: false,
+    sameSite: "lax",
+}
+
+
+//dev
+app.use(
+    session({
+        name: "_alquify-session-id_", 
+        secret: secret,
+        resave: false,
+        saveUninitialized: false,
+        cookie: cookie,
         
     })
 );
 */
+
+
 const success = (message, data) => ({
     status: 200,
     message: message,
