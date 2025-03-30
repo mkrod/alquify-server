@@ -1,4 +1,4 @@
-const client = "http://localhost:5173";
+const client = "https://alquify.up.railway.app"; //"http://localhost:5173";
 const pro_client = "https://alquify.up.railway.app"; //producction client url
 const pro_client_2 = "https://railway.app"; //production domain
 const client2 = "http://localhost";
