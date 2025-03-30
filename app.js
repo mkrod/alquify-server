@@ -52,15 +52,14 @@ app.use((req, res, next) => {
 });
 
 
-app.set("trust proxy", true); // This is REQUIRED for ngrok
+//app.set("trust proxy", true); // This is REQUIRED for ngrok
 const cookie = {            
-    secure: true, // Always true since Ngrok is HTTPS
-    sameSite: "none", 
-    httpOnly: true,
+    secure: true,
+    sameSite: "lax", 
 }
 app.use(
     session({
-        name: "_alquify-session-id_", // Remove "_https" version
+        name: "_alquify-session-id_",
         secret: secret,
         resave: false,
         saveUninitialized: false,
@@ -201,7 +200,7 @@ app.get("/auth/callback", async (req, res) => {
     const code = req.query.code;
     if(!code) return res.send("Something Went wrong");
     const userInfo = await GoogleAuth.getUserInfoFromGoogleAuth(code);
-    console.log("User Info: ", userInfo);
+     console.log("User Info: ", userInfo);
     if(!userInfo) return;
 
     const user_id = `${userInfo?.given_name?.toString()?.toLowerCase()}-${userInfo?.sub}`;
