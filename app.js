@@ -34,6 +34,10 @@ const RedisStore = require("connect-redis").RedisStore; // <-- Fix this line!
 // Create Redis client
 const redisClient = createClient({ url: process.env.REDIS_URL });
 
+const redisPublisher = createClient({ url: process.env.REDIS_URL });
+
+const redisSubscriber = createClient({ url: process.env.REDIS_URL });
+
 redisClient.on("error", (err) => console.error("Redis error:", err));
 
 redisClient.connect().then(() => console.log("Connected to Redis"));
@@ -141,82 +145,59 @@ const failed = (message, data) => ({
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
+// Subscribe to Redis for messages
+redisSubscriber.subscribe("chat");
+redisSubscriber.on("message", (channel, message) => {
+    const data = JSON.parse(message);
+    if (ws_clients[data.sender]) {
+        ws_clients[data.sender].send(message);
+    }
+    if (ws_clients[data.receiver]) {
+        ws_clients[data.receiver].send(message);
+    }
+});
+
 wss.on('connection', (ws) => {
     console.log('WebSocket client connected');
-
-    // Send a welcome message to the client
     ws.send(JSON.stringify({ message: 'Welcome to the WebSocket server!' }));
 
-    // Convert existing clients into an object { clientId: true }
-    const existingClients = Object.keys(ws_clients).reduce((acc, id) => {
-        acc[id] = true;
-        return acc;
-    }, {});
-
-    // Send the existing clients as an object
-    ws.send(JSON.stringify({ type: "existing-clients", clients: existingClients }));
-    
-
-    // Handle incoming messages from clients
-    ws.on('message', (message) => {
-
+    ws.on('message', async (message) => {
         const data = JSON.parse(message);
         console.log("raw message", message.toString());
-
-        //register client
 
         if (data.type === 'register') {
             ws_clients[data.userId] = ws;
             console.log(`${data.userId} is now connected`);
+            await redisClient.set(`ws_user:${data.userId}`, "online");
 
             Object.values(ws_clients).forEach((client) => {
                 client.send(JSON.stringify({ type: 'user-online', userId: data.userId }));
             });
-            
         }
-        
 
-        
-        // incoming message useless block
-        if(data.type === 'send-message'){
-            // incoming message to server
-            //console.log(data)
-            insertMessage(data)
-            .then((res) => {
-                if(res){
-                    const event = JSON.stringify({ type: 'new-message', sender: data.sender, reciever: data.reciever });
-
-            // Send update to the sender
-                    if (ws_clients[data.sender]) {
-                        ws_clients[data.sender].send(event);
-                    }
-
-                    // Send update to the receiver
-                    if (ws_clients[data.reciever]) {
-                        ws_clients[data.reciever].send(event);
-                    }
+        if (data.type === 'send-message') {
+            insertMessage(data).then((res) => {
+                if (res) {
+                    const event = JSON.stringify({ type: 'new-message', sender: data.sender, receiver: data.receiver });
+                    redisPublisher.publish("chat", event); // Publish to Redis for syncing across servers
                 }
-            })
+            });
         }
-        
     });
 
-    ws.on('close', () => {
-        Object.keys(ws_clients).forEach((userId) => {
+    ws.on('close', async () => {
+        for (const userId in ws_clients) {
             if (ws_clients[userId] === ws) {
                 delete ws_clients[userId];
-                console.log(`WebSocket client ${userId}, disconnected`);
+                console.log(`WebSocket client ${userId} disconnected`);
+                await redisClient.del(`ws_user:${userId}`);
             }
-        });
-        const existingClients = Object.keys(ws_clients).reduce((acc, id) => {
-            acc[id] = true;
-            return acc;
-        }, {});
+        }
         Object.values(ws_clients).forEach((client) => {
-            client.send(JSON.stringify({ type: 'user-offline', clients: existingClients }));
+            client.send(JSON.stringify({ type: 'user-offline', clients: Object.keys(ws_clients) }));
         });
-        
     });
+
 });
 
 
