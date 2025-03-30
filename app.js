@@ -28,7 +28,7 @@ const config = require("./config");
 const GoogleAuth = require("./google-auth");
 
 const { createClient } = require("redis");
-const RedisStore = require("connect-redis").RedisStore; // <-- Fix this line!
+const { RedisStore } = require("connect-redis"); // <-- Fix this line!
 
 
 // Create Redis client
@@ -47,7 +47,7 @@ redisClient.connect().then(() => console.log("Connected to Redis"));
 app.use(express.json());
 const corsOptions = {
     origin: function (origin, callback) {
-        const allowedOrigins = [client, client2, pro_client, pro_client_2, this_server_url];
+        const allowedOrigins = [client, client2, pro_client, pro_client_2, this_server_url, "http://localhost", "http://localhost:5173"];
         if (!origin || allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
@@ -68,12 +68,12 @@ const generateUserID = () => {
 }
 
 app.use((req, res, next) => {
-    console.log("Incoming Headers:", req.headers);
+    //console.log("Incoming Headers:", req.headers);
     next();
 });
 
 app.use((req, res, next) => {
-    console.log("Request Cookies:", req.headers.cookie);
+    //console.log("Request Cookies:", req.headers.cookie);
     next();
 });
 
