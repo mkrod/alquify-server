@@ -240,7 +240,7 @@ app.get("/auth/callback", async (req, res) => {
                     return res.send(failed("Session error", {}));
                 }
                 console.log("should be true")
-                res.send(success("started", { isLoggedIn: true }));
+                res.send(success("started", { isLoggedIn: req.session.isLoggedIn }));
             });
             req.session.email = userInfo.email;
             req.session.user_id = user_id;
