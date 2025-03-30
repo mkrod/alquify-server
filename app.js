@@ -276,7 +276,7 @@ app.get("/auth/callback", async (req, res) => {
                 <html>
                     <body>
                         <script>
-                            var newTab = window.open("${client}/dash", "_blank");
+                            var newTab = window.open("${"http://localhost:5173"}/dash");
                             window.opener = null;
                             window.close();
                         </script>
