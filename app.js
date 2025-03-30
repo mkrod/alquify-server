@@ -28,10 +28,19 @@ const config = require("./config");
 const GoogleAuth = require("./google-auth");
 
 app.use(express.json());
-app.use(cors({
-    origin: [client, client2, pro_client, pro_client_2 ,this_server_url],
+const corsOptions = {
+    origin: function (origin, callback) {
+        const allowedOrigins = [client, client2, pro_client, pro_client_2, this_server_url];
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
-}));
+    exposedHeaders: ['set-cookie']
+};
+app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 
 const secret = process.env.SESSION_SECRET;
@@ -51,11 +60,12 @@ app.use((req, res, next) => {
     next();
 });
 
-const cookie = {            
-    secure: true, // Changed to true for HTTPS
-    sameSite: "none", // Required for cross-site
+const isProduction = process.env.NODE_ENV === 'production';
+const cookie = {
+    secure: isProduction, // true in production, false in development
+    sameSite: isProduction ? 'none' : 'lax',
     httpOnly: true,
-    domain: ".railway.app", // Match production domain
+    domain: isProduction ? '.railway.app' : undefined,
     path: "/",
     maxAge: 86400000 // 24h
 }
@@ -72,6 +82,9 @@ app.use(
         rolling: true, // Refresh session on activity
     })
 );
+
+// [Rest of the original file content remains exactly the same...]
+
 
 // [Rest of the original file content remains exactly the same...]
 
