@@ -26,10 +26,18 @@ const PORT = 3000;
 const app = express();
 const config = require("./config");
 const GoogleAuth = require("./google-auth");
-const RedisStore = require("connect-redis").default;
+
 const { createClient } = require("redis");
+const RedisStore = require("connect-redis").RedisStore; // <-- Fix this line!
+
+
+// Create Redis client
 const redisClient = createClient({ url: process.env.REDIS_URL });
-redisClient.connect().catch(console.error);
+
+redisClient.on("error", (err) => console.error("Redis error:", err));
+
+redisClient.connect().then(() => console.log("Connected to Redis"));
+
 
 
 app.use(express.json());
@@ -78,7 +86,7 @@ const cookie = {
 // Session middleware with production-ready config
 app.use(
     session({
-        store: new RedisStore({ client: redisClient }),
+        store: new RedisStore({ client: redisClient }), // <-- Now works correctly
         name: "_alquify-session-id_", 
         secret: secret,
         resave: false,
@@ -1052,12 +1060,8 @@ app.post("/remove-social-token", async (req, res) => {
 });
 
 app.get("/", (req, res) => {
-    const { message } = req.query;
-    const { user_id, user_email } = req.session;
-    res.send(`<html>
-               <div>Alquify: Hello From server<br> 
-                    ${user_email}: ${message}"</div>
-             </html>`);
+    req.session.views = (req.session.views || 0) + 1;
+    res.send(`You visited this page ${req.session.views} times`);
 });
 
 
@@ -1069,9 +1073,9 @@ async function testConnection() {
     } catch (error) {
       console.error('❌ MySQL Connection Error:', error.message);
     }
-  }
+}
   
-  testConnection();
+testConnection();
   
 
 
