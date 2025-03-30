@@ -81,7 +81,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 const cookie = {
     secure: isProduction, // true in production, false in development
     sameSite: isProduction ? 'none' : 'lax',
-    httpOnly: true,
+    httpOnly: false,
     domain: isProduction ? '.railway.app' : undefined,
     path: "/",
     maxAge: 86400000 // 24h
@@ -1065,5 +1065,6 @@ testConnection();
 // Start the server
 server.listen(PORT, "0.0.0.0", () => {
     console.log(`App is running on port ${PORT}`);
-    console.log(`WebSocket server is running on ws://${this_server_url}:${PORT}`);
+    const url = new URL(this_server_url);
+    console.log(`WebSocket server is running on wss://${url.hostname}:${PORT}`);
 });
