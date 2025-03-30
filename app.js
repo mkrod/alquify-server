@@ -256,13 +256,13 @@ app.get("/auth/callback", async (req, res) => {
                     console.error("Session save error:", err);
                     return res.send(failed("Session error", {}));
                 }
-                res.send(success("started", { isLoggedIn: true }));
             });
             req.session.email = userInfo.email;
             req.session.user_id = user_id;
             
             res.cookie("user_email", userInfo.email, cookie);
             res.cookie("user_id", user_id, cookie);
+            res.send(success("started", { isLoggedIn: true }));
             
             res.send(`
                 <html>
