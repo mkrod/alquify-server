@@ -226,6 +226,7 @@ app.get("/auth/callback", async (req, res) => {
                     console.error("Session save error:", err);
                     return res.send(failed("Session error", {}));
                 }
+                console.log("should be true")
                 res.send(success("started", { isLoggedIn: true }));
             });
             req.session.email = userInfo.email;
@@ -288,13 +289,14 @@ app.post("/start-session", async (req, res) => {
             console.error("Session save error:", err);
             return res.send(failed("Session error", {}));
         }
+        console.log("inside start session started")
         res.send(success("started", { isLoggedIn: true }));
     });
 });
 
 // Check session status route
 app.post("/is-logged-in", async (req, res) => {
-    //console.log("Session data in /is-logged-in:", req.session);
+    console.log("Session data in /is-logged-in:", req.session);
     if (req.session?.isLoggedIn) {
         res.send(success("started", { isLoggedIn: true }));
     } else {
