@@ -242,6 +242,7 @@ app.get("/auth/callback", async (req, res) => {
 
             res.cookie("user_email", userInfo.email, cookie);
             res.cookie("user_id", user_id, cookie);
+            
 
             
             res.send(`
@@ -270,6 +271,7 @@ app.get("/auth/callback", async (req, res) => {
             
             res.cookie("user_email", userInfo.email, cookie);
             res.cookie("user_id", user_id, cookie);
+            console.log("Set Cookies: ", userInfo.email + " and " + userInfo.sub)
             //res.send(success("started", { isLoggedIn: req.session.isLoggedIn }));
             
             res.send(`
@@ -306,9 +308,9 @@ app.post("/start-session", async (req, res) => {
 app.post("/is-logged-in", async (req, res) => {
     console.log("Session data in /is-logged-in:", req.session);
     if (req.session?.isLoggedIn) {
-        res.send(success("started", { isLoggedIn: true }));
+        res.send(success("started", { isLoggedIn: req.session.isLoggedIn }));
     } else {
-        res.send(success("not started", { isLoggedIn: false }));
+        res.send(success("not started", { isLoggedIn: req.session.isLoggedIn }));
     }
 });
 
