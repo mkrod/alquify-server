@@ -1,4 +1,4 @@
-const client = "http://localhost:5173";
+const client = "https://alquify.up.railway.app"; //"http://localhost:5173";
 const pro_client = "https://alquify.up.railway.app";
 const pro_client_2 = "https://railway.app";
 const client2 = "http://localhost";
@@ -199,9 +199,9 @@ app.post("/get-user-config", async (req, res) => {
 // Google auth callback route
 app.get("/auth/callback", async (req, res) => {
     const code = req.query.code;
-    if(!code) return;
+    if(!code) return res.send("Something Went wrong");
     const userInfo = await GoogleAuth.getUserInfoFromGoogleAuth(code);
-    //console.log("User Info: ", userInfo);
+    console.log("User Info: ", userInfo);
     if(!userInfo) return;
 
     const user_id = `${userInfo?.given_name?.toString()?.toLowerCase()}-${userInfo?.sub}`;
