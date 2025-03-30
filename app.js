@@ -52,7 +52,7 @@ app.use((req, res, next) => {
 });
 
 
-//app.set("trust proxy", true); // This is REQUIRED for ngrok
+app.set("trust proxy", 1);
 const cookie = {            
     secure: true,
     sameSite: "lax", 
@@ -211,6 +211,13 @@ app.get("/auth/callback", async (req, res) => {
         const [results] = await config.db.execute("INSERT INTO users (user_id, email, auth_method, social_auth_id) VALUES (?, ? , ?, ?)", [user_id, userInfo.email, "google", userInfo.sub]);
         if (results.affectedRows > 0) {
             req.session.isLoggedIn = true;
+            req.session.save((err) => {
+                if (err) {
+                    console.error("Session save error:", err);
+                    return res.send(failed("Session error", {}));
+                }
+                res.send(success("started", { isLoggedIn: true }));
+            });
             req.session.email = userInfo.email;
             req.session.user_id = user_id;
 
@@ -231,7 +238,15 @@ app.get("/auth/callback", async (req, res) => {
         ` );
            }
     } else {
+
             req.session.isLoggedIn = true;
+            req.session.save((err) => {
+                if (err) {
+                    console.error("Session save error:", err);
+                    return res.send(failed("Session error", {}));
+                }
+                res.send(success("started", { isLoggedIn: true }));
+            });
             req.session.email = userInfo.email;
             req.session.user_id = user_id;
             
@@ -258,10 +273,11 @@ app.get("/auth/callback", async (req, res) => {
 // Start session route
 app.post("/start-session", async (req, res) => {
     req.session.isLoggedIn = true;
-    //console.log("Session set in /start-session:", req.session);
-
-    req.session.save(() => {
-        //console.log("Session saved.");
+    req.session.save((err) => {
+        if (err) {
+            console.error("Session save error:", err);
+            return res.send(failed("Session error", {}));
+        }
         res.send(success("started", { isLoggedIn: true }));
     });
 });
