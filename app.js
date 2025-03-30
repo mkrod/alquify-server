@@ -26,6 +26,11 @@ const PORT = 3000;
 const app = express();
 const config = require("./config");
 const GoogleAuth = require("./google-auth");
+const RedisStore = require("connect-redis").default;
+const { createClient } = require("redis");
+const redisClient = createClient({ url: process.env.REDIS_URL });
+redisClient.connect().catch(console.error);
+
 
 app.use(express.json());
 const corsOptions = {
@@ -73,6 +78,7 @@ const cookie = {
 // Session middleware with production-ready config
 app.use(
     session({
+        store: new RedisStore({ client: redisClient }),
         name: "_alquify-session-id_", 
         secret: secret,
         resave: false,
@@ -275,7 +281,7 @@ app.get("/auth/callback", async (req, res) => {
             
             res.cookie("user_email", userInfo.email, cookie);
             res.cookie("user_id", user_id, cookie);
-            res.send(success("started", { isLoggedIn: true }));
+            res.send(success("started", { isLoggedIn: req.session.isLoggedIn }));
             
             res.send(`
                 <html>
